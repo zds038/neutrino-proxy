@@ -51,8 +51,16 @@ jobs:
         [[ $OS == 'ubuntu' ]] && echo "OS=linux" >> $GITHUB_ENV || echo "OS=$OS" >> $GITHUB_ENV
         [[ $OS == 'macos' ]] && echo "OS=darwin" >> $GITHUB_ENV || echo "OS=$OS" >> $GITHUB_ENV
         echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+    - name: Set locale and encoding for Windows
+      run: |
+        $env:LANG = 'zh_CN.UTF-8'
+        $env:LC_ALL = 'zh_CN.UTF-8'
+        [System.Globalization.CultureInfo]::CurrentCulture = [System.Globalization.CultureInfo]::GetCultureInfo('zh-CN')
+        [System.Globalization.CultureInfo]::CurrentUICulture = [System.Globalization.CultureInfo]::GetCultureInfo('zh-CN')
+        setx LANG zh_CN.UTF-8
     - name: Build with Maven (neutrino-proxy-server)
       run: |
+        powershell -Command "$env:JAVA_TOOL_OPTIONS='-Dfile.encoding=UTF-8'"
         set MAVEN_OPTS="-Duser.language=UTF-8 -Dfile.encoding=UTF-8"
         mvn clean install -pl neutrino-proxy-core -am -DskipTests --no-transfer-progress
         cd neutrino-proxy-server
