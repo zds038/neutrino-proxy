@@ -24,10 +24,14 @@ public class AppLoadEndExecutor implements EventListener<AppLoadEndEvent> {
         }
         System.out.printf("""
             ---------------------------------------------------------------
-                    Neutrino Proxy Client %s
-            Gitee: https://gitee.com/dromara/neutrino-proxy
-            GitHub: https://github.com/dromara/neutrino-proxy
-            GitCode: https://gitcode.com/dromara/neutrino-proxy
+            欢迎使用天意科研云-内网穿透服务
+            天意云官网（https://dftianyi.com）
+            ---------------
+            天意科研云（https://sci.dftianyi.com）
+            提供文献互助、ChatGPT、Claude、AI翻译、科研云盘、PDF全能工具等一系列科研工具
+            ---------------
+            天意生信云（https://bio.dftianyi.com）
+            提供生信分析服务、生信服务器、Rstudio、200+款云工具等全方位生信科研服务
             ---------------------------------------------------------------
             %n""", Solon.app().cfg().get("solon.app.version"));
     }
