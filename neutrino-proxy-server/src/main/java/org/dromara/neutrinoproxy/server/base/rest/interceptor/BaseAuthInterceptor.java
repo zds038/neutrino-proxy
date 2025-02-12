@@ -26,6 +26,9 @@ import java.lang.reflect.Method;
 @Component
 public class BaseAuthInterceptor implements RouterInterceptor {
 
+    private static final String API_KEY = "d89d559657574c678c25975c9c96c857";
+
+
     @Override
     public void doIntercept(Context ctx, Handler mainHandler, RouterInterceptorChain chain) throws Throwable {
         if (!(mainHandler instanceof Action)) {
@@ -39,29 +42,45 @@ public class BaseAuthInterceptor implements RouterInterceptor {
         SystemContextHolder.set(systemContext);
         systemContext.setIp(ctx.realIp());
 
-        Authorization authorization = targetMethod.getAnnotation(Authorization.class);
-        if (null == authorization || authorization.login()) {
-            String authorize = ctx.header("Authorize");
-            if (StrUtil.isEmpty(authorize)) {
-                throw ServiceException.create(ExceptionConstant.USER_NOT_LOGIN);
-            }
-            UserDO userDO = Solon.context().getBean(UserService.class).findByToken(authorize);
-            if (null == userDO) {
-                throw ServiceException.create(ExceptionConstant.USER_NOT_LOGIN);
-            }
-            if (EnableStatusEnum.DISABLE.getStatus().equals(userDO.getEnable())) {
-                throw ServiceException.create(ExceptionConstant.USER_DISABLE);
-            }
-            if (null != authorization && authorization.onlyAdmin() && !userDO.getLoginName().equals("admin")) {
-                throw ServiceException.create(ExceptionConstant.NO_PERMISSION_VISIT);
-            }
 
-            systemContext.setToken(authorize);
-            systemContext.setUser(userDO);
+        String uri = ctx.path();
 
-            // token续期
-            Solon.context().getBean(UserService.class).updateTokenExpirationTime(authorize);
+        if (uri.startsWith("/api")) {
+            String apiKey = ctx.header("Authorization");
+            if (StrUtil.isEmpty(apiKey) ||!apiKey.startsWith("Bearer ")) {
+                throw ServiceException.create(ExceptionConstant.API_KEY_INVALID);
+            }
+            apiKey = apiKey.substring(7);
+            if (!API_KEY.equals(apiKey)) {
+                throw ServiceException.create(ExceptionConstant.API_KEY_INVALID);
+            }
+        } else {
+            // 原有逻辑：用户登录认证
+            Authorization authorization = targetMethod.getAnnotation(Authorization.class);
+            if (null == authorization || authorization.login()) {
+                String authorize = ctx.header("Authorize");
+                if (StrUtil.isEmpty(authorize)) {
+                    throw ServiceException.create(ExceptionConstant.USER_NOT_LOGIN);
+                }
+                UserDO userDO = Solon.context().getBean(UserService.class).findByToken(authorize);
+                if (null == userDO) {
+                    throw ServiceException.create(ExceptionConstant.USER_NOT_LOGIN);
+                }
+                if (EnableStatusEnum.DISABLE.getStatus().equals(userDO.getEnable())) {
+                    throw ServiceException.create(ExceptionConstant.USER_DISABLE);
+                }
+                if (null != authorization && authorization.onlyAdmin() && !userDO.getLoginName().equals("admin")) {
+                    throw ServiceException.create(ExceptionConstant.NO_PERMISSION_VISIT);
+                }
+
+                systemContext.setToken(authorize);
+                systemContext.setUser(userDO);
+
+                // token续期
+                Solon.context().getBean(UserService.class).updateTokenExpirationTime(authorize);
+            }
         }
+
         chain.doIntercept(ctx, mainHandler);
     }
 

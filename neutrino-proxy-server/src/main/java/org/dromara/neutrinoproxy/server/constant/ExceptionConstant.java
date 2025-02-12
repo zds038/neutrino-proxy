@@ -55,6 +55,10 @@ public enum ExceptionConstant {
     DOMAIN_NAME_IS_DISABLE(18002, "当前域名[{}]被禁用"),
     SUDOMAIN_NAME_CANNOT_REPEAT(18003, "子域名不能重复"),
     DOMAIN_NAME_IS_USED(18002, "当前域名正在使用"),
+
+
+    //API模块
+    API_KEY_INVALID(19000, "API密钥无效"),
 	;
 
 	private int code;
