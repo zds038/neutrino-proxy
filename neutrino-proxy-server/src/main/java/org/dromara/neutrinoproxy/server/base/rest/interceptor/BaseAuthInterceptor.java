@@ -54,6 +54,8 @@ public class BaseAuthInterceptor implements RouterInterceptor {
             if (!API_KEY.equals(apiKey)) {
                 throw ServiceException.create(ExceptionConstant.API_KEY_INVALID);
             }
+            UserDO userDO = Solon.context().getBean(UserService.class).findById(1);
+            systemContext.setUser(userDO);
         } else {
             // 原有逻辑：用户登录认证
             Authorization authorization = targetMethod.getAnnotation(Authorization.class);
