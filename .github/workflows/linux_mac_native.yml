@@ -13,8 +13,7 @@ jobs:
       matrix:
         # see: https://docs.github.com/zh/actions/using-jobs/choosing-the-runner-for-a-job
         # os: ['ubuntu-20.04', 'macos-12']
-        #os: ['ubuntu-20.04']
-         os: ['macos-13']
+        os: ['ubuntu-20.04']
     name: build - ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     # https://github.com/softprops/action-gh-release/issues/236#issuecomment-1150530128
@@ -27,12 +26,12 @@ jobs:
       with:
         node-version: 13.12.0
         # cache: 'npm' # 使用缓存需要把 package-lock.json 也上传到 git 上
-    # - name: build neutrino-proxy-admin
-    #   run: |
-    #     cd neutrino-proxy-admin
-    #     npm install
-    #     npm run build:docker
-    #     cp -rf ./dist/ ./../neutrino-proxy-server/src/main/resources/static/
+    - name: build neutrino-proxy-admin
+      run: |
+        cd neutrino-proxy-admin
+        npm install
+        npm run build:docker
+        cp -rf ./dist/ ./../neutrino-proxy-server/src/main/resources/static/
     - name: GitHub Action for GraalVM JDK 21
       uses: graalvm/setup-graalvm@v1
       with:
