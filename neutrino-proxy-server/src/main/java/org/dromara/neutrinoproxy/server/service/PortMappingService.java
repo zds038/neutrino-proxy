@@ -218,7 +218,7 @@ public class PortMappingService implements LifecycleBean {
         // 刷新流量限制缓存
         refreshFlowLimitCache(portMappingDO.getId(), portMappingDO.getUpLimitRate(), portMappingDO.getDownLimitRate());
 
-        return new PortMappingCreateRes();
+        return new PortMappingCreateRes(portMappingDO.getId());
     }
 
     public void update(PortMappingUpdateReq req) {
